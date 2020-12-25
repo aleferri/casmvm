@@ -1,6 +1,8 @@
 package vm
 
 import (
+	"fmt"
+
 	"github.com/aleferri/casmvm/pkg/opcodes"
 )
 
@@ -40,11 +42,16 @@ func (t *NaiveVM) Pointer() uint32 {
 	return t.ip
 }
 
-func (t *NaiveVM) Run() opcodes.VMError {
+func (t *NaiveVM) Run(debugMode bool) opcodes.VMError {
 	var err opcodes.VMError = nil
 	for !t.halt && err == nil && int(t.ip) < len(t.list) {
 		op := t.list[int(t.ip)]
 		t.ip++
+		if debugMode {
+			fmt.Println(op.String())
+			fmt.Println(t.es)
+			fmt.Println(t.rs)
+		}
 		err = op.Apply(t)
 	}
 	return err

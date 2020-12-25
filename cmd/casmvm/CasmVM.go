@@ -127,7 +127,7 @@ func main() {
 				break
 			}
 
-			execErr := vm.Run()
+			execErr := vm.Run(debugMode)
 
 			if execErr != nil {
 				fmt.Println(execErr.Error(), execErr.OpcodeID())
