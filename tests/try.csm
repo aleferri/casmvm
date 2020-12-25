@@ -1,0 +1,15 @@
+iconst 20
+iconst 20
+add
+iconst 10
+rpush
+rload 0
+rload 0
+add
+rpush
+iconst 10000
+rload 1
+sub
+rload 0
+div
+ret
