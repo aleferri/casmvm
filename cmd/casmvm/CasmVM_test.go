@@ -1,4 +1,4 @@
-package casmvm
+package main
 
 import "testing"
 
