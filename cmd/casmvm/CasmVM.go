@@ -9,14 +9,11 @@ import (
 	"strings"
 
 	"github.com/aleferri/casmvm/pkg/opcodes"
+	"github.com/aleferri/casmvm/pkg/operators"
 	"github.com/aleferri/casmvm/pkg/vm"
 )
 
-func add(a, b int64) (int64, error) { return a + b, nil }
-func sub(a, b int64) (int64, error) { return a - b, nil }
-func mul(a, b int64) (int64, error) { return a * b, nil }
-func div(a, b int64) (int64, error) { return a / b, nil }
-func neg(a int64) (int64, error)    { return -a, nil }
+func neg(a int64) (int64, error) { return -a, nil }
 
 func LineByLine(sourceFile string, debugMode bool) (*vm.NaiveVM, error) {
 	var programfile, programErr = os.Open(sourceFile)
@@ -45,22 +42,6 @@ func LineByLine(sourceFile string, debugMode bool) (*vm.NaiveVM, error) {
 		left := strings.TrimSpace(strings.TrimPrefix(line, opcodeName))
 		args := strings.Split(left, ",")
 		switch opcodeName {
-		case "add":
-			{
-				listings = append(listings, opcodes.MakeBinaryOp(opcodeName, add))
-			}
-		case "sub":
-			{
-				listings = append(listings, opcodes.MakeBinaryOp(opcodeName, sub))
-			}
-		case "mul":
-			{
-				listings = append(listings, opcodes.MakeBinaryOp(opcodeName, mul))
-			}
-		case "div":
-			{
-				listings = append(listings, opcodes.MakeBinaryOp(opcodeName, div))
-			}
 		case "rpush":
 			{
 				listings = append(listings, opcodes.MakeRPush())
@@ -104,6 +85,14 @@ func LineByLine(sourceFile string, debugMode bool) (*vm.NaiveVM, error) {
 			{
 				offset, _ := strconv.ParseUint(args[0], 10, 64)
 				listings = append(listings, opcodes.MakeRLoad(uint32(offset)))
+			}
+		default:
+			{
+				for str, fn := range operators.BinaryOperatorsNames {
+					if opcodeName == str {
+						listings = append(listings, opcodes.MakeBinaryOp(str, fn))
+					}
+				}
 			}
 		}
 		line, err = programCode.ReadString('\n')
