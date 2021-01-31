@@ -16,3 +16,18 @@ func TestCasmVM(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestCasmVMErr(t *testing.T) {
+	vm, err := ParseLineByLine("../../tests/tryerr.csm", true)
+	if err != nil {
+		t.Error(err.Error())
+		t.Fail()
+		return
+	}
+
+	runErr := vm.Run(true)
+	if runErr == nil {
+		t.Error(runErr.Error())
+		t.Fail()
+	}
+}

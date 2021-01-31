@@ -1,5 +1,7 @@
 package opcodes
 
+import "github.com/aleferri/casmvm/pkg/vmio"
+
 //VM interface on opcode execution
 type VM interface {
 	EvalStack() Stack
@@ -9,4 +11,5 @@ type VM interface {
 	WrapError(e error) VMError
 	Halt()
 	Pointer() uint32
+	Logger() vmio.VMLogger
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -11,6 +12,7 @@ import (
 	"github.com/aleferri/casmvm/pkg/opcodes"
 	"github.com/aleferri/casmvm/pkg/operators"
 	"github.com/aleferri/casmvm/pkg/vm"
+	"github.com/aleferri/casmvm/pkg/vmio"
 )
 
 func neg(a int64) (int64, error) { return -a, nil }
@@ -83,8 +85,27 @@ func ParseLineByLine(sourceFile string, debugMode bool) (*vm.NaiveVM, error) {
 				offset, _ := strconv.ParseUint(args[0], 10, 64)
 				listings = append(listings, opcodes.MakeRLoad(uint32(offset)))
 			}
+		case "sigwarn":
+			{
+				ref, _ := strconv.ParseUint(args[0], 10, 64)
+				message := strings.Join(args[1:], ",")
+				message = strings.TrimLeft(message, "\"")
+				message = strings.TrimRight(message, "\"")
+				listings = append(listings, opcodes.MakeSigWarning(message, uint32(ref)))
+			}
+		case "sigerr":
+			{
+				ref, _ := strconv.ParseUint(args[0], 10, 64)
+				message := strings.Join(args[1:], ",")
+				message = strings.TrimLeft(message, "\"")
+				message = strings.TrimRight(message, "\"")
+				listings = append(listings, opcodes.MakeSigError(message, uint32(ref)))
+			}
 		default:
 			{
+				if line[0] == ';' {
+					goto NEXT
+				}
 				for str, fn := range operators.BinaryOperatorsNames {
 					if opcodeName == str {
 						listings = append(listings, opcodes.MakeBinaryOp(str, fn))
@@ -97,13 +118,15 @@ func ParseLineByLine(sourceFile string, debugMode bool) (*vm.NaiveVM, error) {
 						goto NEXT
 					}
 				}
+
+				return nil, errors.New("Missing opcode " + opcodeName)
 			}
 		}
 	NEXT:
 		line, err = programCode.ReadString('\n')
 	}
 
-	return vm.MakeNaiveVM(listings), nil
+	return vm.MakeNaiveVM(listings, vmio.MakeVMLoggerConsole(vmio.ALL)), nil
 }
 
 func main() {

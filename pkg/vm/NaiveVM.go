@@ -4,14 +4,16 @@ import (
 	"fmt"
 
 	"github.com/aleferri/casmvm/pkg/opcodes"
+	"github.com/aleferri/casmvm/pkg/vmio"
 )
 
 type NaiveVM struct {
-	ip   uint32
-	es   opcodes.Stack
-	rs   opcodes.Stack
-	list []opcodes.Opcode
-	halt bool
+	ip     uint32
+	es     opcodes.Stack
+	rs     opcodes.Stack
+	list   []opcodes.Opcode
+	halt   bool
+	logger vmio.VMLogger
 }
 
 func (t *NaiveVM) EvalStack() opcodes.Stack {
@@ -57,6 +59,10 @@ func (t *NaiveVM) Run(debugMode bool) opcodes.VMError {
 	return err
 }
 
-func MakeNaiveVM(listing []opcodes.Opcode) *NaiveVM {
-	return &NaiveVM{0, MakeStack(), MakeStack(), listing, false}
+func (t *NaiveVM) Logger() vmio.VMLogger {
+	return t.logger
+}
+
+func MakeNaiveVM(listing []opcodes.Opcode, log vmio.VMLogger) *NaiveVM {
+	return &NaiveVM{0, MakeStack(), MakeStack(), listing, false, log}
 }

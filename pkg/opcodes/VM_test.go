@@ -1,6 +1,10 @@
 package opcodes
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/aleferri/casmvm/pkg/vmio"
+)
 
 type testerr struct {
 	embed   error
@@ -49,6 +53,10 @@ func (t *testvm) Halt() {
 
 func (t *testvm) Pointer() uint32 {
 	return t.ip
+}
+
+func (t *testvm) Logger() vmio.VMLogger {
+	return vmio.MakeVMLoggerConsole(vmio.ALL)
 }
 
 type teststack struct {

@@ -1,16 +1,17 @@
 iconst 20
 iconst 20
 add
-; should be 40
+; 40 | -
 iconst 10
 rpush
-; empty eval stack, 40 in the return stack
+; 40 | 10
 rload 0
 rload 0
 add
-; 20
+; 20 40 | 10
 rpush
 iconst 10000
+sigerr 1, "should be less than 15, but is "
 rload 1
 sub
 rload 0
