@@ -2,24 +2,28 @@ package operators
 
 //BinaryOperatorsSymbols for client application
 var BinaryOperatorsSymbols = map[string]func(int64, int64) (int64, error){
-	"&&": EvalLogicalAnd, "||": EvalLogicalOR, "==": EvalEqual, "!=": EvalNotEqual, ">": EvalGreaterThan, ">=": EvalGreaterEqualThan, "<=": EvalLessEqualThan,
-	"<": EvalLessThan, "<<": EvalShiftLeft, ">>": EvalShiftRight, "+": EvalAdd, "-": EvalSub, "*": EvalMul, "/": EvalDiv, "%": EvalMod, "&": EvalAnd,
-	"|": EvalOr, "^": EvalXor,
+	"&&": WrapBinaryOp(EvalLogicalAnd), "||": WrapBinaryOp(EvalLogicalOR), "==": WrapBinaryOp(EvalEqual), "!=": WrapBinaryOp(EvalNotEqual),
+	">": WrapBinaryOp(EvalGreaterThan), ">=": WrapBinaryOp(EvalGreaterEqualThan), "<=": WrapBinaryOp(EvalLessEqualThan),
+	"<": WrapBinaryOp(EvalLessThan), "<<": WrapBinaryOp(EvalShiftLeft), ">>": WrapBinaryOp(EvalShiftRight), "+": WrapBinaryOp(EvalAdd),
+	"-": WrapBinaryOp(EvalSub), "*": WrapBinaryOp(EvalMul), "/": EvalDiv, "%": EvalMod, "&": WrapBinaryOp(EvalAnd),
+	"|": WrapBinaryOp(EvalOr), "^": WrapBinaryOp(EvalXor),
 }
 
 //BinaryOperatorsNames for casmvm
 var BinaryOperatorsNames = map[string]func(int64, int64) (int64, error){
-	"andl": EvalLogicalAnd, "orl": EvalLogicalOR, "cmpeq": EvalEqual, "cmpne": EvalNotEqual, "cmpgt": EvalGreaterThan, "cmpge": EvalGreaterEqualThan,
-	"cmple": EvalLessEqualThan, "cmplt": EvalLessThan, "shl": EvalShiftLeft, "shr": EvalShiftRight, "add": EvalAdd, "sub": EvalSub, "mul": EvalMul,
-	"div": EvalDiv, "mod": EvalMod, "and": EvalAnd, "or": EvalOr, "xor": EvalXor,
+	"andl": WrapBinaryOp(EvalLogicalAnd), "orl": WrapBinaryOp(EvalLogicalOR), "cmpeq": WrapBinaryOp(EvalEqual), "cmpne": WrapBinaryOp(EvalNotEqual),
+	"cmpgt": WrapBinaryOp(EvalGreaterThan), "cmpge": WrapBinaryOp(EvalGreaterEqualThan), "cmple": WrapBinaryOp(EvalLessEqualThan),
+	"cmplt": WrapBinaryOp(EvalLessThan), "shl": WrapBinaryOp(EvalShiftLeft), "shr": WrapBinaryOp(EvalShiftRight),
+	"add": WrapBinaryOp(EvalAdd), "sub": WrapBinaryOp(EvalSub), "mul": WrapBinaryOp(EvalMul), "div": EvalDiv, "mod": EvalMod,
+	"and": WrapBinaryOp(EvalAnd), "or": WrapBinaryOp(EvalOr), "xor": WrapBinaryOp(EvalXor),
 }
 
 //UnaryOperatorsSymbols for client application
 var UnaryOperatorsSymbols = map[string]func(int64) (int64, error){
-	"-": EvalNeg, "!": EvalLogicalNot, "~": EvalNot,
+	"-": WrapUnaryOp(EvalNeg), "!": WrapUnaryOp(EvalLogicalNot), "~": WrapUnaryOp(EvalNot),
 }
 
 //UnaryOperatorsNames for casmvm
 var UnaryOperatorsNames = map[string]func(int64) (int64, error){
-	"neg": EvalNeg, "notl": EvalLogicalNot, "not": EvalNot,
+	"neg": WrapUnaryOp(EvalNeg), "notl": WrapUnaryOp(EvalLogicalNot), "not": WrapUnaryOp(EvalNot),
 }

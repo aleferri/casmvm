@@ -3,7 +3,7 @@ package main
 import "testing"
 
 func TestCasmVM(t *testing.T) {
-	vm, err := LineByLine("../../tests/try.csm", true)
+	vm, err := ParseLineByLine("../../tests/try.csm", true)
 	if err != nil {
 		t.Error(err.Error())
 		t.Fail()

@@ -13,4 +13,12 @@ sub
 rload 0
 div
 add
-ret
+iconst 77
+and
+iconst 22
+xor
+neg
+not
+iconst 1
+cmple
+ret 2
