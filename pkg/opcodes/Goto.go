@@ -1,6 +1,8 @@
 package opcodes
 
-import "strconv"
+import (
+	"fmt"
+)
 
 //Goto is the branching opcode, pop the integer constant, check against the compare then branch to the result
 type Goto struct {
@@ -8,11 +10,11 @@ type Goto struct {
 }
 
 func (op *Goto) String() string {
-	return "goto " + strconv.FormatInt(int64(op.offset), 10)
+	return fmt.Sprintf("        goto %d", op.offset)
 }
 
 func (op *Goto) Apply(vm VM) VMError {
-	vm.GotoOffset(op.offset)
+	vm.Goto(op.offset)
 	return nil
 }
 

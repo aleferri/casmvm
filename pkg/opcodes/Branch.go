@@ -1,26 +1,29 @@
 package opcodes
 
-import "strconv"
+import (
+	"fmt"
+)
 
 //Branch is the branching opcode, pop the integer constant, check against the compare then branch to the result
 type Branch struct {
 	cmpval int64
 	ifeq   int32
+	cmpref uint16
 }
 
 func (op *Branch) String() string {
-	return "if= " + strconv.FormatInt(op.cmpval, 10) + ", " + strconv.FormatInt(int64(op.ifeq), 10)
+	return fmt.Sprintf("        ifeq %d %d %d", op.cmpref, op.cmpval, op.ifeq)
 }
 
 func (op *Branch) Apply(vm VM) VMError {
-	top := vm.EvalStack().Pop()
+	top := vm.Frame().Values().Peek(op.cmpref)
 	if top == op.cmpval {
-		vm.GotoOffset(op.ifeq)
+		vm.Goto(op.ifeq)
 	}
 	return nil
 }
 
 //MakeBranch opcode
-func MakeBranch(cmpval int64, offset int32) Opcode {
-	return &Branch{cmpval: cmpval, ifeq: offset}
+func MakeBranch(cmpval int64, cmpref uint16, offset int32) Opcode {
+	return &Branch{cmpval: cmpval, ifeq: offset, cmpref: cmpref}
 }

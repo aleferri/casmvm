@@ -9,7 +9,7 @@ import (
 //SigWarning issue a warning on a specified parameter/local variable
 type SigWarning struct {
 	msg string
-	ref uint32
+	ref uint16
 }
 
 func (op *SigWarning) String() string {
@@ -17,12 +17,12 @@ func (op *SigWarning) String() string {
 }
 
 func (op *SigWarning) Apply(vm VM) VMError {
-	val := vm.RetStack().Load(op.ref)
+	val := vm.Frame().Values().Peek(op.ref)
 	vm.Logger().Log(vmio.WARNING, op.msg+strconv.FormatInt(val, 10))
 	return nil
 }
 
 //MakeSigWarning make an opcode of reference check
-func MakeSigWarning(msg string, ref uint32) Opcode {
+func MakeSigWarning(msg string, ref uint16) Opcode {
 	return &SigWarning{msg, ref}
 }

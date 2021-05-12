@@ -10,7 +10,7 @@ import (
 //SigError issue a warning on a specified parameter/local variable
 type SigError struct {
 	msg string
-	ref uint32
+	ref uint16
 }
 
 func (op *SigError) String() string {
@@ -18,12 +18,12 @@ func (op *SigError) String() string {
 }
 
 func (op *SigError) Apply(vm VM) VMError {
-	val := vm.RetStack().Load(op.ref)
+	val := vm.Frame().Values().Peek(op.ref)
 	vm.Logger().Log(vmio.ERROR, op.msg+strconv.FormatInt(val, 10))
 	return vm.WrapError(errors.New(op.msg + strconv.FormatInt(val, 10)))
 }
 
 //MakeSigError make an opcode of reference check
-func MakeSigError(msg string, ref uint32) Opcode {
+func MakeSigError(msg string, ref uint16) Opcode {
 	return &SigError{msg, ref}
 }

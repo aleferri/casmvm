@@ -10,7 +10,7 @@ func TestCasmVM(t *testing.T) {
 		return
 	}
 
-	runErr := vm.Run(true)
+	_, runErr := vm.Enter(0)
 	if runErr != nil {
 		t.Error(runErr.Error())
 		t.Fail()
@@ -25,7 +25,7 @@ func TestCasmVMErr(t *testing.T) {
 		return
 	}
 
-	runErr := vm.Run(true)
+	_, runErr := vm.Enter(0)
 	if runErr == nil {
 		t.Error(runErr.Error())
 		t.Fail()

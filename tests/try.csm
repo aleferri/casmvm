@@ -1,27 +1,13 @@
-iconst 20
-iconst 20
-add
-; should be 40
-iconst 10
-rpush
-; empty eval stack, 40 in the return stack
-rload 0
-rload 0
-add
-; 20
-rpush
-iconst 10000
-rload 1
-sub
-rload 0
-div
-add
-iconst 77
-and
-iconst 22
-xor
-neg
-not
-iconst 1
-cmple
-ret 2
+%0   = const  u16     20
+%1   = add    u16     %0 %0    ; should be 40
+%2   = local  u16     %0
+%3   = add    u16     %0 %2
+%4   = const  u16     10000
+%5   = sub    u16     %4
+%6   = div    u16     %4 %0     
+%7   = and    u16     %2 %2
+%8   = xor    u16     %7 %6
+%9   = neg    i16     %8
+%10  = not    u16     %9
+%11  = cmple  i16     %10 %1
+leave  %11 %11
