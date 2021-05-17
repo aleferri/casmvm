@@ -1,28 +1,17 @@
-iconst 20
-iconst 20
-add
-; 40 | -
-iconst 10
-rpush
-; 40 | 10
-rload 0
-rload 0
-add
-; 20 40 | 10
-rpush
-iconst 10000
-sigerr 1, "should be less than 15, but is "
-rload 1
-sub
-rload 0
-div
-add
-iconst 77
-and
-iconst 22
-xor
-neg
-not
-iconst 1
-cmple
-ret 2
+%0      = const i16 20
+%1      = add i16 %0 %0
+%2      = const i16 10
+%3      = add i16 %2 %2
+%4      = const i16 10000
+sigerr %1, "should be less than 15, but is "
+%5      = sub i16 %4, %3
+%6      = div i16 %5 %1
+%7      = const i16 77
+%8      = and i16 %7 %6
+%9      = const i16 22
+%10     = xor i16 %9 %8
+%11     = neg i16 %10
+%12     = not i16 %11
+%13     = const i16 1
+%14     = cmple i16 %13, %12
+leave %2

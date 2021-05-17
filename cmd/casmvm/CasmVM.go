@@ -18,6 +18,9 @@ import (
 func neg(a int64) (int64, error) { return -a, nil }
 
 func ParseLeftPart(localName string, words []string) (opcodes.Opcode, error) {
+	if len(words) < 3 { // opname shape operand
+		return nil, fmt.Errorf("Expected <opname> <shape> <operand> [<operand>], but %v found", words)
+	}
 	opName := words[0]
 	local, _ := strconv.ParseUint(localName, 10, 16)
 	refARaw := strings.TrimPrefix(words[2], "%")
@@ -36,6 +39,9 @@ func ParseLeftPart(localName string, words []string) (opcodes.Opcode, error) {
 		{
 			for str, fn := range operators.BinaryOperatorsNames {
 				if opName == str {
+					if len(words) < 4 {
+						return nil, errors.New("Missing operand")
+					}
 					refBRaw := strings.TrimPrefix(words[3], "%")
 					refB, _ := strconv.ParseUint(refBRaw, 10, 16)
 					return opcodes.MakeBinaryOp(uint16(local), opName, opcodes.IntShape, uint16(refA), uint16(refB), fn), nil
@@ -65,11 +71,12 @@ func ParseLineByLine(sourceFile string, debugMode bool) (*vm.NaiveVM, error) {
 
 	var err error
 	var line string
+	var parseError error = nil
 
 	listings := []opcodes.Opcode{}
 
 	line, err = programCode.ReadString('\n')
-	for err == nil {
+	for err == nil && parseError == nil {
 		eqIndex := strings.IndexByte(line, '=')
 		if eqIndex > 0 {
 			rawName := strings.TrimSpace(line[:eqIndex])
@@ -77,10 +84,10 @@ func ParseLineByLine(sourceFile string, debugMode bool) (*vm.NaiveVM, error) {
 			leftPart := line[eqIndex+1:]
 			components := strings.Fields(leftPart)
 			if debugMode {
-				fmt.Printf("Recognized '%s'\n", components[1])
+				fmt.Printf("Recognized '%s'\n", components[0])
 			}
 			opcode, errOpcode := ParseLeftPart(localName, components)
-			err = errOpcode
+			parseError = errOpcode
 			listings = append(listings, opcode)
 		} else {
 			components := strings.Fields(line)
@@ -138,6 +145,7 @@ func ParseLineByLine(sourceFile string, debugMode bool) (*vm.NaiveVM, error) {
 					listings = append(listings, opcodes.MakeSigError(message, uint16(ref)))
 				}
 			}
+			parseError = nil
 		}
 
 		line, err = programCode.ReadString('\n')
@@ -146,7 +154,7 @@ func ParseLineByLine(sourceFile string, debugMode bool) (*vm.NaiveVM, error) {
 	callable := vm.MakeCallable()
 	callable.Set(listings)
 
-	return vm.MakeNaiveVM([]vm.Callable{callable}, vmio.MakeVMLoggerConsole(vmio.ALL), vm.MakeVMFrame()), nil
+	return vm.MakeNaiveVM([]vm.Callable{callable}, vmio.MakeVMLoggerConsole(vmio.ALL), vm.MakeVMFrame()), parseError
 }
 
 func main() {
