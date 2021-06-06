@@ -2,7 +2,6 @@ package opcodes
 
 import (
 	"fmt"
-	"strconv"
 )
 
 //UnaryOp is a unary operation that reference another local variable
@@ -15,9 +14,7 @@ type UnaryOp struct {
 }
 
 func (op *UnaryOp) String() string {
-	t := strconv.FormatUint(uint64(op.local), 10)
-	ref := strconv.FormatUint(uint64(op.ref), 10)
-	return fmt.Sprintf("%%%5v = %8v %8v %%%5v", t, op.name, op.shape.name, ref)
+	return fmt.Sprintf("%%%d = %v %v %%%d", op.local, op.name, op.shape.name, op.ref)
 }
 
 func (op *UnaryOp) Apply(vm VM) VMError {

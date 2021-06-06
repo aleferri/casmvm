@@ -2,7 +2,6 @@ package opcodes
 
 import (
 	"fmt"
-	"strconv"
 )
 
 //BinaryOp is a binary operation between two references
@@ -16,10 +15,7 @@ type BinaryOp struct {
 }
 
 func (op *BinaryOp) String() string {
-	t := strconv.FormatUint(uint64(op.local), 10)
-	aRef := strconv.FormatUint(uint64(op.aRef), 10)
-	bRef := strconv.FormatUint(uint64(op.bRef), 10)
-	return fmt.Sprintf("%%%v = %v %v %%%v %%%v", t, op.name, op.shape.name, aRef, bRef)
+	return fmt.Sprintf("%%%d = %v %v %%%d %%%d", op.local, op.name, op.shape.name, op.aRef, op.bRef)
 }
 
 func (op *BinaryOp) Apply(vm VM) VMError {

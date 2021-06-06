@@ -2,7 +2,6 @@ package opcodes
 
 import (
 	"fmt"
-	"strconv"
 )
 
 //Local assign a new value to a local variable
@@ -13,7 +12,7 @@ type Local struct {
 }
 
 func (op *Local) String() string {
-	return fmt.Sprintf("%%%v = local    i16      %d", strconv.FormatUint(uint64(op.local), 10), op.ref)
+	return fmt.Sprintf("%%%d = local i16 %d", op.local, op.ref)
 }
 
 func (op *Local) Apply(vm VM) VMError {

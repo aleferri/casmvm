@@ -2,7 +2,6 @@ package opcodes
 
 import (
 	"fmt"
-	"strconv"
 )
 
 //IConst push integer constant
@@ -12,7 +11,7 @@ type IConst struct {
 }
 
 func (op *IConst) String() string {
-	return fmt.Sprintf("%%%v = const i64 %d", strconv.FormatUint(uint64(op.assign), 10), op.value)
+	return fmt.Sprintf("%%%d = const i64 %d", op.assign, op.value)
 }
 
 func (op *IConst) Apply(vm VM) VMError {
