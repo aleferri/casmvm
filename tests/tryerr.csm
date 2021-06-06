@@ -3,7 +3,7 @@
 %2      = const i16 10
 %3      = add i16 %2 %2
 %4      = const i16 10000
-sigerr %1, "should be less than 15, but is "
+sigerr %1 "should be less than 15, but is "
 %5      = sub i16 %4, %3
 %6      = div i16 %5 %1
 %7      = const i16 77

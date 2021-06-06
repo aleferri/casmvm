@@ -28,6 +28,7 @@ type NaiveVM struct {
 	current   VMFrame
 	halt      bool
 	last      bool
+	verbose   bool
 }
 
 func (t *NaiveVM) Frame() opcodes.LocalFrame {
@@ -42,7 +43,7 @@ func (t *NaiveVM) Enter(frame int32, vals ...uint16) (opcodes.LocalFrame, opcode
 		next.values.Put(uint16(i), prev.Local(v))
 	}
 	list := t.callables[frame]
-	err := t.Run(list, false)
+	err := t.Run(list, t.verbose)
 	t.current = prev
 	t.last = wasLast
 	return &next, err
@@ -89,5 +90,9 @@ func (t *NaiveVM) Logger() vmio.VMLogger {
 }
 
 func MakeNaiveVM(callables []Callable, log vmio.VMLogger, bootstrap VMFrame) *NaiveVM {
-	return &NaiveVM{callables, log, bootstrap, false, true}
+	return &NaiveVM{callables, log, bootstrap, false, true, false}
+}
+
+func MakeVerboseNaiveVM(callables []Callable, log vmio.VMLogger, bootstrap VMFrame) *NaiveVM {
+	return &NaiveVM{callables, log, bootstrap, false, true, true}
 }

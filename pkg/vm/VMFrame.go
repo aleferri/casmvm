@@ -2,6 +2,7 @@ package vm
 
 import "github.com/aleferri/casmvm/pkg/opcodes"
 
+//VMFrame keep the current frame state
 type VMFrame struct {
 	values  *opcodes.RegisterFile
 	returns *opcodes.RegisterFile

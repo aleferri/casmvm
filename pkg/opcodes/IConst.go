@@ -12,7 +12,7 @@ type IConst struct {
 }
 
 func (op *IConst) String() string {
-	return fmt.Sprintf("%%%5v = const    i64      %d", strconv.FormatUint(uint64(op.assign), 10), op.value)
+	return fmt.Sprintf("%%%v = const i64 %d", strconv.FormatUint(uint64(op.assign), 10), op.value)
 }
 
 func (op *IConst) Apply(vm VM) VMError {

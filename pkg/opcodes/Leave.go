@@ -4,6 +4,7 @@ import (
 	"strconv"
 )
 
+//Leave a Frame
 type Leave struct {
 	refs []uint16
 }

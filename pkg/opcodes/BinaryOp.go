@@ -19,7 +19,7 @@ func (op *BinaryOp) String() string {
 	t := strconv.FormatUint(uint64(op.local), 10)
 	aRef := strconv.FormatUint(uint64(op.aRef), 10)
 	bRef := strconv.FormatUint(uint64(op.bRef), 10)
-	return fmt.Sprintf("%%%5v = %8v %8v %%%5v %%%5v", t, op.name, op.shape.name, aRef, bRef)
+	return fmt.Sprintf("%%%v = %v %v %%%v %%%v", t, op.name, op.shape.name, aRef, bRef)
 }
 
 func (op *BinaryOp) Apply(vm VM) VMError {

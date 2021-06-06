@@ -14,7 +14,7 @@ type SigError struct {
 }
 
 func (op *SigError) String() string {
-	return "sigerr " + strconv.FormatUint(uint64(op.ref), 10)
+	return "sigerr " + strconv.FormatUint(uint64(op.ref), 10) + " " + op.msg
 }
 
 func (op *SigError) Apply(vm VM) VMError {

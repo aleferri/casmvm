@@ -4,6 +4,7 @@ import (
 	"strconv"
 )
 
+//Enter a frame
 type Enter struct {
 	start uint16
 	frame uint32

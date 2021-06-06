@@ -13,7 +13,7 @@ type SigWarning struct {
 }
 
 func (op *SigWarning) String() string {
-	return "sigwarn " + strconv.FormatUint(uint64(op.ref), 10)
+	return "sigwarn " + strconv.FormatUint(uint64(op.ref), 10) + " " + op.msg
 }
 
 func (op *SigWarning) Apply(vm VM) VMError {
