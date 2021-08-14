@@ -42,8 +42,7 @@ func ParseLineByLine(sourceFile string, debugMode bool) (*vm.NaiveVM, error) {
 		keepGoing = err == nil
 	}
 
-	callable := vm.MakeCallable()
-	callable.Set(listings)
+	callable := vm.MakeCallable(listings)
 
 	return vm.MakeVerboseNaiveVM([]vm.Callable{callable}, vmio.MakeVMLoggerConsole(vmio.ALL), vm.MakeVMFrame()), nil
 }

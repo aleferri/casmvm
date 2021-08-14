@@ -8,7 +8,7 @@ import (
 )
 
 func TestOpcodes(t *testing.T) {
-	callable := MakeCallable()
+	callable := MakeCallable([]opcodes.Opcode{})
 	callable.list = append(callable.list, opcodes.MakeIConst(0, 8))
 	callable.list = append(callable.list, opcodes.MakeAssignment(1, 0, opcodes.ShortShape))
 	callable.list = append(callable.list, opcodes.MakeIConst(2, 16))

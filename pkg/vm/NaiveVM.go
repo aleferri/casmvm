@@ -16,8 +16,18 @@ func (c *Callable) Set(list []opcodes.Opcode) {
 	c.list = list
 }
 
+func (c *Callable) Get() []opcodes.Opcode {
+	return c.list
+}
+
+func (c *Callable) Debug() {
+	for _, op := range c.list {
+		fmt.Println(op.String())
+	}
+}
+
 //Make a callable object for the VM
-func MakeCallable() Callable {
+func MakeCallable(list []opcodes.Opcode) Callable {
 	return Callable{[]opcodes.Opcode{}}
 }
 
