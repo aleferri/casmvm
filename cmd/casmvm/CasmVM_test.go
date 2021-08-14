@@ -1,6 +1,8 @@
 package main
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestCasmVM(t *testing.T) {
 	vm, err := ParseLineByLine("../../tests/try.csm", true)

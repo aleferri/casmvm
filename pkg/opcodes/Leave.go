@@ -1,8 +1,6 @@
 package opcodes
 
-import (
-	"strconv"
-)
+import "fmt"
 
 //Leave a Frame
 type Leave struct {
@@ -12,9 +10,9 @@ type Leave struct {
 func (op *Leave) String() string {
 	refs := ""
 	for _, e := range op.refs {
-		refs += strconv.FormatUint(uint64(e), 10) + " "
+		refs += fmt.Sprintf("%%%d ", e)
 	}
-	return "        leave  " + refs
+	return "leave " + refs
 }
 
 func (op *Leave) Apply(vm VM) VMError {

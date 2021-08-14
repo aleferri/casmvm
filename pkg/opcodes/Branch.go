@@ -12,7 +12,7 @@ type Branch struct {
 }
 
 func (op *Branch) String() string {
-	return fmt.Sprintf("        ifeq %d %d %d", op.cmpref, op.cmpval, op.ifeq)
+	return fmt.Sprintf("ifeq %%%d %d %d", op.cmpref, op.cmpval, op.ifeq)
 }
 
 func (op *Branch) Apply(vm VM) VMError {

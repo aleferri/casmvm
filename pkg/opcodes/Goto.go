@@ -10,7 +10,7 @@ type Goto struct {
 }
 
 func (op *Goto) String() string {
-	return fmt.Sprintf("        goto %d", op.offset)
+	return fmt.Sprintf("goto %d", op.offset)
 }
 
 func (op *Goto) Apply(vm VM) VMError {

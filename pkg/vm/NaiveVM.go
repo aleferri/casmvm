@@ -20,7 +20,8 @@ func (c *Callable) Get() []opcodes.Opcode {
 	return c.list
 }
 
-func (c *Callable) Debug() {
+func (c *Callable) Dump() {
+	fmt.Printf("Total: %d opcodes\n", len(c.list))
 	for _, op := range c.list {
 		fmt.Println(op.String())
 	}
@@ -28,7 +29,7 @@ func (c *Callable) Debug() {
 
 //Make a callable object for the VM
 func MakeCallable(list []opcodes.Opcode) Callable {
-	return Callable{[]opcodes.Opcode{}}
+	return Callable{list}
 }
 
 //NaiveVM is a simple implementation of the VM interface found on opcodes
@@ -97,6 +98,10 @@ func (t *NaiveVM) Run(c Callable, debugMode bool) opcodes.VMError {
 
 func (t *NaiveVM) Logger() vmio.VMLogger {
 	return t.logger
+}
+
+func (t *NaiveVM) Callables() []Callable {
+	return t.callables
 }
 
 func MakeNaiveVM(callables []Callable, log vmio.VMLogger, bootstrap VMFrame) *NaiveVM {

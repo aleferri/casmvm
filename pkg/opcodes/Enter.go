@@ -1,8 +1,6 @@
 package opcodes
 
-import (
-	"strconv"
-)
+import "fmt"
 
 //Enter a frame
 type Enter struct {
@@ -14,9 +12,9 @@ type Enter struct {
 func (op *Enter) String() string {
 	refs := ""
 	for _, e := range op.refs {
-		refs += strconv.FormatUint(uint64(e), 10) + " "
+		refs += fmt.Sprintf("%%%d ", e)
 	}
-	return "        enter " + strconv.FormatUint(uint64(op.start), 10) + strconv.FormatUint(uint64(op.frame), 10) + " " + refs
+	return fmt.Sprintf("enter %d %d %s", op.start, op.frame, refs)
 }
 
 func (op *Enter) Apply(vm VM) VMError {

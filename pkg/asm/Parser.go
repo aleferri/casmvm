@@ -114,7 +114,7 @@ func ParseOpcode(line string, verbose bool) (opcodes.Opcode, error) {
 	switch opcodeName {
 	case "branch":
 		{
-			ref, _ := strconv.ParseUint(words[1], 10, 16)
+			ref, _ := strconv.ParseUint(words[1][1:], 10, 16)
 			val, _ := strconv.ParseInt(words[2], 10, 64)
 			offset, _ := strconv.ParseInt(words[3], 10, 64)
 			return opcodes.MakeBranch(val, uint16(ref), int32(offset)), nil
@@ -128,7 +128,7 @@ func ParseOpcode(line string, verbose bool) (opcodes.Opcode, error) {
 		{
 			refs := []uint16{}
 			for _, r := range words[1:] {
-				ref, _ := strconv.ParseUint(r, 10, 16)
+				ref, _ := strconv.ParseUint(r[1:], 10, 16)
 				refs = append(refs, uint16(ref))
 			}
 			return opcodes.MakeLeave(refs...), nil
@@ -139,7 +139,7 @@ func ParseOpcode(line string, verbose bool) (opcodes.Opcode, error) {
 			frame, _ := strconv.ParseUint(words[2], 10, 32)
 			refs := []uint16{}
 			for _, r := range words[1:] {
-				ref, _ := strconv.ParseUint(r, 10, 16)
+				ref, _ := strconv.ParseUint(r[1:], 10, 16)
 				refs = append(refs, uint16(ref))
 			}
 			return opcodes.MakeEnter(uint16(start), uint32(frame), refs), nil
