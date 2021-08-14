@@ -49,7 +49,7 @@ func (t *NaiveVM) Frame() opcodes.LocalFrame {
 func (t *NaiveVM) Enter(frame int32, vals ...uint16) (opcodes.LocalFrame, opcodes.VMError) {
 	prev := t.current
 	wasLast := t.last
-	next := VMFrame{}
+	next := MakeVMFrame()
 	for i, v := range vals {
 		next.values.Put(uint16(i), prev.Local(v))
 	}

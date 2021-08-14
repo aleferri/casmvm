@@ -7,18 +7,10 @@ type RegisterFile struct {
 
 //Put a value in the specified register
 func (i *RegisterFile) Put(indx uint16, val int64) {
-	cmp := uint16(len(i.vals))
-	if cmp < indx {
-		old := i.vals
-		i.vals = make([]int64, indx+1)
-		for _, n := range old {
-			i.vals[n] = old[n]
-		}
-	} else if cmp == indx {
-		i.vals = append(i.vals, val)
-	} else {
-		i.vals[indx] = val
+	for len(i.vals) <= int(indx) {
+		i.vals = append(i.vals, 0)
 	}
+	i.vals[indx] = val
 }
 
 //Peek value from the specified registers
