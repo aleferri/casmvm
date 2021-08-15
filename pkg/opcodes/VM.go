@@ -12,4 +12,6 @@ type VM interface {
 	Halt()
 	Pointer() uint32
 	Logger() vmio.VMLogger
+	Dump(frame int32)
+	DumpAll()
 }
