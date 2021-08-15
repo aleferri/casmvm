@@ -96,6 +96,17 @@ func (t *NaiveVM) Run(c Callable, debugMode bool) opcodes.VMError {
 	return err
 }
 
+func (t *NaiveVM) Dump(frame int32) {
+	t.callables[frame].Dump()
+}
+
+func (t *NaiveVM) DumpAll() {
+	for frame, c := range t.callables {
+		fmt.Printf("Frame %d\n", frame)
+		c.Dump()
+	}
+}
+
 func (t *NaiveVM) Logger() vmio.VMLogger {
 	return t.logger
 }
