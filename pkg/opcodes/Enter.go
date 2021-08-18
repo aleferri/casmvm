@@ -1,10 +1,13 @@
 package opcodes
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 //Enter a frame
 type Enter struct {
-	start uint16
+	rets  []uint16
 	frame uint32
 	refs  []uint16
 }
@@ -14,19 +17,23 @@ func (op *Enter) String() string {
 	for _, e := range op.refs {
 		refs += fmt.Sprintf("%%%d ", e)
 	}
-	return fmt.Sprintf("enter %d %d %s", op.start, op.frame, refs)
+	rets := ""
+	for _, e := range op.rets {
+		rets += fmt.Sprintf("%%%d ", e)
+	}
+	return fmt.Sprintf("[%s] = enter %d %s", strings.Trim(rets, " "), op.frame, refs)
 }
 
 func (op *Enter) Apply(vm VM) VMError {
 	called, err := vm.Enter(int32(op.frame), op.refs...)
 	rets := called.Returns().vals
 	for i, r := range rets {
-		vm.Frame().Values().Put(op.start+uint16(i), r)
+		vm.Frame().Values().Put(op.rets[i], r)
 	}
 	return err
 }
 
 //MakeEnter instruction
-func MakeEnter(start uint16, frame uint32, refs []uint16) Opcode {
-	return &Enter{start, frame, refs}
+func MakeEnter(rets []uint16, frame uint32, refs []uint16) Opcode {
+	return &Enter{rets, frame, refs}
 }

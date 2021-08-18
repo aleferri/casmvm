@@ -1,4 +1,4 @@
-package vm
+package vmex
 
 import (
 	"fmt"
@@ -9,18 +9,29 @@ import (
 
 //Callable is a sequential list of opcodes to execute
 type Callable struct {
-	list []opcodes.Opcode
+	name   string
+	params []string
+	list   []opcodes.Opcode
 }
 
-func (c *Callable) Set(list []opcodes.Opcode) {
-	c.list = list
-}
-
-func (c *Callable) Get() []opcodes.Opcode {
+//Listing of opcodes
+func (c Callable) Listing() []opcodes.Opcode {
 	return c.list
 }
 
-func (c *Callable) Dump() {
+//Params for the callable
+func (c Callable) Params() []string {
+	return c.params
+}
+
+//Name of the callable
+func (c Callable) Name() string {
+	return c.name
+}
+
+//Dump content of the callable
+func (c Callable) Dump() {
+	fmt.Println("_"+c.name, ":")
 	fmt.Printf("Total: %d opcodes\n", len(c.list))
 	for _, op := range c.list {
 		fmt.Println(op.String())
@@ -28,8 +39,8 @@ func (c *Callable) Dump() {
 }
 
 //Make a callable object for the VM
-func MakeCallable(list []opcodes.Opcode) Callable {
-	return Callable{list}
+func MakeCallable(name string, params []string, list []opcodes.Opcode) Callable {
+	return Callable{name, params, list}
 }
 
 //NaiveVM is a simple implementation of the VM interface found on opcodes
@@ -38,7 +49,6 @@ type NaiveVM struct {
 	logger    vmio.VMLogger
 	current   VMFrame
 	halt      bool
-	last      bool
 	verbose   bool
 }
 
@@ -47,23 +57,26 @@ func (t *NaiveVM) Frame() opcodes.LocalFrame {
 }
 
 func (t *NaiveVM) Enter(frame int32, vals ...uint16) (opcodes.LocalFrame, opcodes.VMError) {
+	fmt.Println("Entering frame", frame)
 	prev := t.current
-	wasLast := t.last
 	next := MakeVMFrame()
+	t.current = next
 	for i, v := range vals {
 		next.values.Put(uint16(i), prev.Local(v))
 	}
+	fmt.Println("Accept", next.values)
 	list := t.callables[frame]
 	err := t.Run(list, t.verbose)
 	t.current = prev
-	t.last = wasLast
+	fmt.Println("Leaving frame", frame)
+	fmt.Println("Return", next.returns)
+	if prev.pc != 0 {
+		t.halt = false
+	}
 	return &next, err
 }
 
-func (t *NaiveVM) Leave(vals ...uint16) {
-	for i, v := range vals {
-		t.current.returns.Put(uint16(i), t.current.Local(v))
-	}
+func (t *NaiveVM) Leave() {
 	t.halt = true
 }
 
@@ -116,9 +129,9 @@ func (t *NaiveVM) Callables() []Callable {
 }
 
 func MakeNaiveVM(callables []Callable, log vmio.VMLogger, bootstrap VMFrame) *NaiveVM {
-	return &NaiveVM{callables, log, bootstrap, false, true, false}
+	return &NaiveVM{callables, log, bootstrap, false, false}
 }
 
 func MakeVerboseNaiveVM(callables []Callable, log vmio.VMLogger, bootstrap VMFrame) *NaiveVM {
-	return &NaiveVM{callables, log, bootstrap, false, true, true}
+	return &NaiveVM{callables, log, bootstrap, false, true}
 }

@@ -1,4 +1,4 @@
-package vm
+package vmex
 
 //OpcodeError is an error occurred during opcode execution
 type OpcodeError struct {

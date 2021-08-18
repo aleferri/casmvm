@@ -16,7 +16,11 @@ func (op *Leave) String() string {
 }
 
 func (op *Leave) Apply(vm VM) VMError {
-	vm.Leave(op.refs...)
+	frame := vm.Frame()
+	for i, v := range op.refs {
+		frame.Returns().Put(uint16(i), frame.Local(v))
+	}
+	vm.Leave()
 	return nil
 }
 

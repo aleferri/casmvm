@@ -32,7 +32,7 @@ func ParseAssertOpcode(makeAssert MakeAssert, line string) (opcodes.Opcode, erro
 //ParseValueOpcode parse opcodes that produces values
 func ParseValueOpcode(indexName string, words []string, verbose bool) (opcodes.Opcode, error) {
 	if len(words) < 3 { // opname shape operand
-		return nil, fmt.Errorf("Expected <opname> <shape> <operand> [<operand>], but %v found", words)
+		return nil, fmt.Errorf("expected <opname> <shape> <operand> [<operand>], but %v found", words)
 	}
 	opName := words[0]
 	if verbose {
@@ -51,12 +51,30 @@ func ParseValueOpcode(indexName string, words []string, verbose bool) (opcodes.O
 			fullInt, _ := strconv.ParseInt(refARaw, 10, 64)
 			return opcodes.MakeIConst(uint16(local), fullInt), nil
 		}
+	case "enter":
+		{
+			multiRetRaw := strings.Trim(indexName, "[] ")
+			multiRet := strings.Fields(multiRetRaw)
+			refsRet := []uint16{}
+			for _, ret := range multiRet {
+				val, _ := strconv.Atoi(ret[1:])
+				refsRet = append(refsRet, uint16(val))
+			}
+			frame, _ := strconv.ParseUint(words[1], 10, 32)
+			refs := []uint16{}
+			for _, r := range words[2:] {
+				ref, _ := strconv.ParseUint(r[1:], 10, 16)
+				refs = append(refs, uint16(ref))
+			}
+			fmt.Println(refsRet)
+			return opcodes.MakeEnter(refsRet, uint32(frame), refs), nil
+		}
 	default:
 		{
 			for str, fn := range operators.BinaryOperatorsNames {
 				if opName == str {
 					if len(words) < 4 {
-						return nil, errors.New("Missing operand")
+						return nil, errors.New("missing operand")
 					}
 					refBRaw := strings.TrimPrefix(words[3], "%")
 					refB, _ := strconv.ParseUint(refBRaw, 10, 16)
@@ -93,17 +111,17 @@ func ParseOpcode(line string, verbose bool) (opcodes.Opcode, error) {
 	if indexComment > 0 {
 		line = line[0:indexComment]
 	}
-	if line[0] == '%' {
+	if line[0] == '%' || line[0] == '[' {
 		indexEq := strings.IndexByte(line, '=')
 		if indexEq > 2 {
 			leftPart := line[1:indexEq]
 			if verbose {
-				fmt.Printf("Assign to reference %s\n", leftPart)
+				fmt.Printf("Assign to reference %s\n", line[0:indexEq])
 			}
 			words := strings.Fields(line[indexEq+1:])
 			return ParseValueOpcode(leftPart, words, verbose)
 		} else {
-			return nil, fmt.Errorf("Expected <ref> '=' <rest-of-opcode>, but found %s instead\n", line)
+			return nil, fmt.Errorf("expected <ref> '=' <rest-of-opcode>, but found %s instead", line)
 		}
 	}
 	words := strings.Fields(line)
@@ -133,17 +151,6 @@ func ParseOpcode(line string, verbose bool) (opcodes.Opcode, error) {
 			}
 			return opcodes.MakeLeave(refs...), nil
 		}
-	case "enter":
-		{
-			start, _ := strconv.ParseUint(words[1], 10, 16)
-			frame, _ := strconv.ParseUint(words[2], 10, 32)
-			refs := []uint16{}
-			for _, r := range words[1:] {
-				ref, _ := strconv.ParseUint(r[1:], 10, 16)
-				refs = append(refs, uint16(ref))
-			}
-			return opcodes.MakeEnter(uint16(start), uint32(frame), refs), nil
-		}
 	}
-	return nil, errors.New("Opcode is invalid")
+	return nil, errors.New("opcode is invalid")
 }

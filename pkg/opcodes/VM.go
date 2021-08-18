@@ -7,7 +7,7 @@ type VM interface {
 	Frame() LocalFrame
 	Goto(disp int32)
 	Enter(frame int32, vals ...uint16) (LocalFrame, VMError)
-	Leave(vals ...uint16)
+	Leave()
 	WrapError(e error) VMError
 	Halt()
 	Pointer() uint32

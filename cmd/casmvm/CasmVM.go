@@ -9,42 +9,52 @@ import (
 
 	"github.com/aleferri/casmvm/pkg/asm"
 	"github.com/aleferri/casmvm/pkg/opcodes"
-	"github.com/aleferri/casmvm/pkg/vm"
+	"github.com/aleferri/casmvm/pkg/vmex"
 	"github.com/aleferri/casmvm/pkg/vmio"
 )
 
-func neg(a int64) (int64, error) { return -a, nil }
-
 //ParseLineByLine provided source file and return the vm for the program
-func ParseLineByLine(sourceFile string, debugMode bool) (*vm.NaiveVM, error) {
+func ParseLineByLine(sourceFile string, debugMode bool) (*vmex.NaiveVM, error) {
 	var programfile, programErr = os.Open(sourceFile)
 	if programErr != nil {
 		wnd, _ := os.Getwd()
-		return nil, fmt.Errorf("Error during opening of file %s from %s\n", sourceFile, wnd)
+		return nil, fmt.Errorf("error during opening of file %s from %s", sourceFile, wnd)
 	}
 
 	programCode := bufio.NewReader(programfile)
 
 	keepGoing := true
 
-	listings := []opcodes.Opcode{}
+	listing := []opcodes.Opcode{}
+	fn := ""
+
+	callables := []vmex.Callable{}
 
 	for keepGoing {
 		line, err := programCode.ReadString('\n')
 		line = strings.TrimSpace(line)
+		if line[0:2] == "fn" {
+			if len(listing) > 0 {
+				callables = append(callables, vmex.MakeCallable(fn, []string{}, listing))
+				listing = []opcodes.Opcode{}
+			}
+			tokens := strings.Fields(line)
+			fn = tokens[1]
+			line = ""
+		}
 		if line != "" && line[0] != ';' {
 			opcode, parseError := asm.ParseOpcode(line, debugMode)
-			listings = append(listings, opcode)
+			listing = append(listing, opcode)
 			if parseError != nil {
 				return nil, parseError
 			}
 		}
 		keepGoing = err == nil
 	}
+	callables = append(callables, vmex.MakeCallable(fn, []string{}, listing))
+	log := vmio.MakeVMLoggerConsole(vmio.ALL)
 
-	callable := vm.MakeCallable(listings)
-
-	return vm.MakeVerboseNaiveVM([]vm.Callable{callable}, vmio.MakeVMLoggerConsole(vmio.ALL), vm.MakeVMFrame()), nil
+	return vmex.MakeVerboseNaiveVM(callables, log, vmex.MakeVMFrame()), nil
 }
 
 func main() {

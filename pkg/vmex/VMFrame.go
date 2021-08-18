@@ -1,4 +1,4 @@
-package vm
+package vmex
 
 import "github.com/aleferri/casmvm/pkg/opcodes"
 
