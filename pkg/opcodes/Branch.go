@@ -11,6 +11,15 @@ type Branch struct {
 	cmpref uint16
 }
 
+func (op *Branch) Locals() []uint16 {
+	return []uint16{}
+}
+
+func (op *Branch) References() []uint16 {
+	r := []uint16{uint16(op.cmpref)}
+	return r
+}
+
 func (op *Branch) String() string {
 	return fmt.Sprintf("ifeq %%%d %d %d", op.cmpref, op.cmpval, op.ifeq)
 }

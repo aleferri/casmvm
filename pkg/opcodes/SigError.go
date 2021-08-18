@@ -13,6 +13,15 @@ type SigError struct {
 	ref uint16
 }
 
+func (op *SigError) Locals() []uint16 {
+	return []uint16{}
+}
+
+func (op *SigError) References() []uint16 {
+	r := []uint16{op.ref}
+	return r
+}
+
 func (op *SigError) String() string {
 	return "sigerr " + strconv.FormatUint(uint64(op.ref), 10) + " " + op.msg
 }

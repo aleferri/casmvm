@@ -13,6 +13,19 @@ type UnaryOp struct {
 	operator UnaryOperator
 }
 
+func (op *UnaryOp) Locals() []uint16 {
+	return []uint16{op.local}
+}
+
+func (op *UnaryOp) References() []uint16 {
+	r := []uint16{op.ref}
+	return r
+}
+
+func (op *UnaryOp) Operator() UnaryOperator {
+	return op.operator
+}
+
 func (op *UnaryOp) String() string {
 	return fmt.Sprintf("%%%d = %v %v %%%d", op.local, op.name, op.shape.name, op.ref)
 }

@@ -5,9 +5,11 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/aleferri/casmvm/pkg/asm"
+	"github.com/aleferri/casmvm/pkg/fast"
 	"github.com/aleferri/casmvm/pkg/opcodes"
 	"github.com/aleferri/casmvm/pkg/vmex"
 	"github.com/aleferri/casmvm/pkg/vmio"
@@ -27,6 +29,7 @@ func ParseLineByLine(sourceFile string, debugMode bool) (*vmex.NaiveVM, error) {
 
 	listing := []opcodes.Opcode{}
 	fn := ""
+	params := []string{}
 
 	callables := []vmex.Callable{}
 
@@ -35,11 +38,16 @@ func ParseLineByLine(sourceFile string, debugMode bool) (*vmex.NaiveVM, error) {
 		line = strings.TrimSpace(line)
 		if line[0:2] == "fn" {
 			if len(listing) > 0 {
-				callables = append(callables, vmex.MakeCallable(fn, []string{}, listing))
+				callables = append(callables, vmex.MakeCallable(fn, params, listing))
 				listing = []opcodes.Opcode{}
 			}
 			tokens := strings.Fields(line)
 			fn = tokens[1]
+			params = []string{}
+			n, _ := strconv.Atoi(tokens[2])
+			for i := 0; i < n; i++ {
+				params = append(params, fmt.Sprintf("%%%d", i))
+			}
 			line = ""
 		}
 		if line != "" && line[0] != ';' {
@@ -51,10 +59,17 @@ func ParseLineByLine(sourceFile string, debugMode bool) (*vmex.NaiveVM, error) {
 		}
 		keepGoing = err == nil
 	}
-	callables = append(callables, vmex.MakeCallable(fn, []string{}, listing))
+	callables = append(callables, vmex.MakeCallable(fn, params, listing))
 	log := vmio.MakeVMLoggerConsole(vmio.ALL)
 
-	return vmex.MakeVerboseNaiveVM(callables, log, vmex.MakeVMFrame()), nil
+	optimized := []vmex.Callable{}
+	for _, c := range callables {
+		folded := fast.Fold(c)
+		dce := fast.DeadCodeElimination(folded)
+		optimized = append(optimized, dce)
+	}
+
+	return vmex.MakeVerboseNaiveVM(optimized, log, vmex.MakeVMFrame()), nil
 }
 
 func main() {

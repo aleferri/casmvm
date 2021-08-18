@@ -11,8 +11,17 @@ type Local struct {
 	shape Shape
 }
 
+func (op *Local) Locals() []uint16 {
+	return []uint16{op.local}
+}
+
+func (op *Local) References() []uint16 {
+	r := []uint16{op.ref}
+	return r
+}
+
 func (op *Local) String() string {
-	return fmt.Sprintf("%%%d = local i16 %d", op.local, op.ref)
+	return fmt.Sprintf("%%%d = local i16 %%%d", op.local, op.ref)
 }
 
 func (op *Local) Apply(vm VM) VMError {

@@ -7,6 +7,14 @@ type Leave struct {
 	refs []uint16
 }
 
+func (op *Leave) Locals() []uint16 {
+	return []uint16{}
+}
+
+func (op *Leave) References() []uint16 {
+	return op.refs
+}
+
 func (op *Leave) String() string {
 	refs := ""
 	for _, e := range op.refs {

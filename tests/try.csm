@@ -1,8 +1,8 @@
-fn mulby3 0
+fn mulby3 1 0
 %1   = const  u16     3
 %2   = mul    u16     %0 %1
 leave %2
-fn test 1
+fn test 0 1
 %0   = const  u16     20
 %1   = add    u16     %0 %0    ; should be 40
 %2   = local  u16     %0

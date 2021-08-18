@@ -12,6 +12,15 @@ type SigWarning struct {
 	ref uint16
 }
 
+func (op *SigWarning) Locals() []uint16 {
+	return []uint16{}
+}
+
+func (op *SigWarning) References() []uint16 {
+	r := []uint16{op.ref}
+	return r
+}
+
 func (op *SigWarning) String() string {
 	return "sigwarn " + strconv.FormatUint(uint64(op.ref), 10) + " " + op.msg
 }

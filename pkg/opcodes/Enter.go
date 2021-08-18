@@ -12,6 +12,14 @@ type Enter struct {
 	refs  []uint16
 }
 
+func (op *Enter) Locals() []uint16 {
+	return op.rets
+}
+
+func (op *Enter) References() []uint16 {
+	return op.refs
+}
+
 func (op *Enter) String() string {
 	refs := ""
 	for _, e := range op.refs {

@@ -22,6 +22,7 @@ func TestCasmVM(t *testing.T) {
 	if ret.Returns().Peek(1) != 60 {
 		t.Error("Expected 60 as first return value")
 	}
+	t.Fail()
 }
 
 func TestCasmVMErr(t *testing.T) {

@@ -9,6 +9,15 @@ type Goto struct {
 	offset int32
 }
 
+func (op *Goto) Locals() []uint16 {
+	return []uint16{}
+}
+
+func (op *Goto) References() []uint16 {
+	r := []uint16{}
+	return r
+}
+
 func (op *Goto) String() string {
 	return fmt.Sprintf("goto %d", op.offset)
 }
