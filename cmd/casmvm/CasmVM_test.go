@@ -18,24 +18,25 @@ func TestCasmVM(t *testing.T) {
 	}
 	if ret.Returns().Peek(0) != 0 {
 		t.Error("Expected 0 as first return value")
+		t.Fail()
 	}
 	if ret.Returns().Peek(1) != 60 {
 		t.Error("Expected 60 as first return value")
+		t.Fail()
 	}
-	t.Fail()
 }
 
 func TestCasmVMErr(t *testing.T) {
-	vm, err := ParseLineByLine("../../tests/tryerr.csm", true)
-	if err != nil {
-		t.Error(err.Error())
+	vm, parseErr := ParseLineByLine("../../tests/tryerr.csm", true)
+	if parseErr != nil {
+		t.Error(parseErr.Error())
 		t.Fail()
 		return
 	}
 
 	_, runErr := vm.Enter(0)
 	if runErr == nil {
-		t.Error(runErr.Error())
+		t.Error("Was expecting an error")
 		t.Fail()
 	}
 }

@@ -20,7 +20,7 @@ func TestOpcodes(t *testing.T) {
 
 	vm := MakeNaiveVM([]Callable{callable}, vmio.MakeVMLoggerConsole(vmio.ALL), initialFrame)
 	for i, k := range callable.list {
-		initialFrame.pc = uint16(i)
+		initialFrame.pc = uint32(i)
 		k.Apply(vm)
 	}
 	if initialFrame.Returns().Peek(1) != -128 {

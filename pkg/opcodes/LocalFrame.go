@@ -40,5 +40,5 @@ type LocalFrame interface {
 	//Return value
 	Returns() *RegisterFile
 	//PC is the current program pointer
-	PC() uint16
+	PC() uint32
 }

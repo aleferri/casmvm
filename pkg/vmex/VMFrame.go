@@ -6,7 +6,7 @@ import "github.com/aleferri/casmvm/pkg/opcodes"
 type VMFrame struct {
 	values  *opcodes.RegisterFile
 	returns *opcodes.RegisterFile
-	pc      uint16
+	pc      uint32
 }
 
 func (f *VMFrame) Values() *opcodes.RegisterFile {
@@ -21,7 +21,7 @@ func (f *VMFrame) Returns() *opcodes.RegisterFile {
 	return f.returns
 }
 
-func (f *VMFrame) PC() uint16 {
+func (f *VMFrame) PC() uint32 {
 	return f.pc
 }
 

@@ -81,7 +81,7 @@ func (t *NaiveVM) Leave() {
 }
 
 func (t *NaiveVM) Goto(disp int32) {
-	t.current.pc = uint16(int32(t.current.pc) + disp)
+	t.current.pc = uint32(int32(t.current.pc) + disp)
 }
 
 func (t *NaiveVM) WrapError(e error) opcodes.VMError {
