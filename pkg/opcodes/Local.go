@@ -21,7 +21,7 @@ func (op *Local) References() []uint16 {
 }
 
 func (op *Local) String() string {
-	return fmt.Sprintf("%%%d = local i16 %%%d", op.local, op.ref)
+	return fmt.Sprintf("%%%d = local %s %%%d", op.local, op.shape.name, op.ref)
 }
 
 func (op *Local) Apply(vm VM) VMError {

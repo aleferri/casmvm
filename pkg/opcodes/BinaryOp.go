@@ -62,6 +62,8 @@ func (op *BinaryOp) Apply(vm VM) VMError {
 	if err != nil {
 		return vm.WrapError(err)
 	}
+
+	result = op.shape.Reshape(result)
 	vm.Frame().Values().Put(op.local, result)
 	return nil
 }
