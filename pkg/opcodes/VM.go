@@ -8,6 +8,7 @@ type VM interface {
 	Goto(disp int32)
 	Enter(frame int32, vals ...uint16) (LocalFrame, VMError)
 	Leave()
+	Invoke(fIndex int32, frame LocalFrame) VMError
 	WrapError(e error) VMError
 	Halt()
 	Pointer() uint32
