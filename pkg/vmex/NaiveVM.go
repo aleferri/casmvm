@@ -136,13 +136,13 @@ func (t *NaiveVM) Invoke(fIndex int32, frame opcodes.LocalFrame) opcodes.VMError
 	return err
 }
 
-func (t *NaiveVM) Dump(frame int32) {
-	t.callables[frame].Dump()
+func (t *NaiveVM) Dump(index int32) {
+	t.callables[index].Dump()
 }
 
 func (t *NaiveVM) DumpAll() {
-	for frame, c := range t.callables {
-		fmt.Printf("Frame %d\n", frame)
+	for index, c := range t.callables {
+		fmt.Printf("Frame %d\n", index)
 		c.Dump()
 	}
 }

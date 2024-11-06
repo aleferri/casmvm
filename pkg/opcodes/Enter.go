@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-//Enter a frame
+// Enter a frame
 type Enter struct {
 	rets  []uint16
 	frame uint32
@@ -35,13 +35,18 @@ func (op *Enter) String() string {
 func (op *Enter) Apply(vm VM) VMError {
 	called, err := vm.Enter(int32(op.frame), op.refs...)
 	rets := called.Returns().vals
+
+	if len(rets) != len(op.rets) {
+		return vm.WrapError(fmt.Errorf("Len of formal returns and effective returns diffs, expected %d returns, received %d instead", len(op.rets), len(rets)))
+	}
+
 	for i, r := range rets {
 		vm.Frame().Values().Put(op.rets[i], r)
 	}
 	return err
 }
 
-//MakeEnter instruction
+// MakeEnter instruction
 func MakeEnter(rets []uint16, frame uint32, refs []uint16) Opcode {
 	return &Enter{rets, frame, refs}
 }
