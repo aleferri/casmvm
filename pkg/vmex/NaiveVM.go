@@ -64,12 +64,11 @@ func (t *NaiveVM) Enter(callIndex int32, vals ...uint16) (opcodes.LocalFrame, op
 func (t *NaiveVM) Invoke(callIndex int32, vals ...uint16) (opcodes.LocalFrame, opcodes.VMError) {
 	callable := t.callables[callIndex]
 	if t.verbose {
-		fmt.Println("Enter callable", callIndex, callable.name)
+		fmt.Printf("Enter callable %d(%s) with args %v\n", callIndex, callable.name, vals)
 	}
 
 	prev := t.current
 	next := MakeVMFrame()
-	t.current = next
 	for i, v := range vals {
 		next.values.Put(uint16(i), prev.Local(v))
 	}
@@ -78,13 +77,13 @@ func (t *NaiveVM) Invoke(callIndex int32, vals ...uint16) (opcodes.LocalFrame, o
 		fmt.Println("Accept", next.values)
 	}
 
+	t.current = next
 	err := t.Run(callable, t.verbose)
 	t.current = prev
 	t.leave = false
 
 	if t.verbose {
-		fmt.Println("Leave callable", callIndex, callable.name)
-		fmt.Println("Return", next.returns)
+		fmt.Printf("Leave callable %d(%s) with returns %v\n", callIndex, callable.name, next.returns)
 	}
 
 	return &next, err
