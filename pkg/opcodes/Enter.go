@@ -7,9 +7,9 @@ import (
 
 // Enter a frame
 type Enter struct {
-	rets  []uint16
-	frame uint32
-	refs  []uint16
+	rets     []uint16
+	callable uint32
+	refs     []uint16
 }
 
 func (op *Enter) Locals() []uint16 {
@@ -29,15 +29,15 @@ func (op *Enter) String() string {
 	for _, e := range op.rets {
 		rets += fmt.Sprintf("%%%d ", e)
 	}
-	return fmt.Sprintf("[%s] = enter %d %s", strings.Trim(rets, " "), op.frame, refs)
+	return fmt.Sprintf("[%s] = enter %d %s", strings.Trim(rets, " "), op.callable, refs)
 }
 
 func (op *Enter) Apply(vm VM) VMError {
-	called, err := vm.Enter(int32(op.frame), op.refs...)
+	called, err := vm.Enter(int32(op.callable), op.refs...)
 	rets := called.Returns().vals
 
 	if len(rets) != len(op.rets) {
-		return vm.WrapError(fmt.Errorf("Len of formal returns and effective returns diffs, expected %d returns, received %d instead", len(op.rets), len(rets)))
+		return vm.WrapError(fmt.Errorf("len of formal returns and effective returns diffs, expected %d returns, received %d instead", len(op.rets), len(rets)))
 	}
 
 	for i, r := range rets {

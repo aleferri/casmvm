@@ -37,7 +37,7 @@ func TestCasmVMInvoke(t *testing.T) {
 
 	ret := vmex.MakeVMFrame()
 
-	runErr := vm.Invoke(1, &ret)
+	runErr := vm.Start(1, &ret)
 	if runErr != nil {
 		t.Error(runErr.Error())
 		return

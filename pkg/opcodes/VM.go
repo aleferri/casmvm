@@ -6,13 +6,14 @@ import "github.com/aleferri/casmvm/pkg/vmio"
 type VM interface {
 	Frame() LocalFrame
 	Goto(disp int32)
-	Enter(frame int32, vals ...uint16) (LocalFrame, VMError)
+	Enter(callable int32, vals ...uint16) (LocalFrame, VMError)
+	Invoke(callable int32, vals ...uint16) (LocalFrame, VMError)
+	Start(callable int32, frame LocalFrame) VMError
 	Leave()
-	Invoke(fIndex int32, frame LocalFrame) VMError
 	WrapError(e error) VMError
 	Halt()
 	Pointer() uint32
 	Logger() vmio.VMLogger
-	Dump(frame int32)
+	Dump(callable int32)
 	DumpAll()
 }

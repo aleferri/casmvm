@@ -57,9 +57,14 @@ func (t *NaiveVM) Frame() opcodes.LocalFrame {
 	return &t.current
 }
 
-func (t *NaiveVM) Enter(frame int32, vals ...uint16) (opcodes.LocalFrame, opcodes.VMError) {
+func (t *NaiveVM) Enter(callIndex int32, vals ...uint16) (opcodes.LocalFrame, opcodes.VMError) {
+	return t.Invoke(callIndex, vals...)
+}
+
+func (t *NaiveVM) Invoke(callIndex int32, vals ...uint16) (opcodes.LocalFrame, opcodes.VMError) {
+	callable := t.callables[callIndex]
 	if t.verbose {
-		fmt.Println("Entering frame", frame)
+		fmt.Println("Enter callable", callIndex, callable.name)
 	}
 
 	prev := t.current
@@ -73,13 +78,12 @@ func (t *NaiveVM) Enter(frame int32, vals ...uint16) (opcodes.LocalFrame, opcode
 		fmt.Println("Accept", next.values)
 	}
 
-	list := t.callables[frame]
-	err := t.Run(list, t.verbose)
+	err := t.Run(callable, t.verbose)
 	t.current = prev
 	t.leave = false
 
 	if t.verbose {
-		fmt.Println("Leaving frame", frame)
+		fmt.Println("Leave callable", callIndex, callable.name)
 		fmt.Println("Return", next.returns)
 	}
 
@@ -119,20 +123,22 @@ func (t *NaiveVM) Run(c Callable, debugMode bool) opcodes.VMError {
 	return err
 }
 
-func (t *NaiveVM) Invoke(fIndex int32, frame opcodes.LocalFrame) opcodes.VMError {
-	var err opcodes.VMError = nil
+func (t *NaiveVM) Start(fIndex int32, frame opcodes.LocalFrame) opcodes.VMError {
 	t.halt = false
-	c := t.callables[fIndex]
+	callable := t.callables[fIndex]
 
+	prev := t.current
+
+	t.current = MakeVMFrame()
 	t.current.pc = frame.PC()
 	t.current.returns = frame.Returns()
 	t.current.values = frame.Values()
 
-	for !t.halt && err == nil && int(t.current.pc) < len(c.list) {
-		op := c.list[int(t.current.pc)]
-		t.current.pc++
-		err = op.Apply(t)
-	}
+	err := t.Run(callable, t.verbose)
+
+	t.current = prev
+	t.leave = false
+
 	return err
 }
 
@@ -142,7 +148,7 @@ func (t *NaiveVM) Dump(index int32) {
 
 func (t *NaiveVM) DumpAll() {
 	for index, c := range t.callables {
-		fmt.Printf("Frame %d\n", index)
+		fmt.Printf("Callable %d\n", index)
 		c.Dump()
 	}
 }
