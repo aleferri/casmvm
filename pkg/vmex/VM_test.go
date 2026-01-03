@@ -18,7 +18,7 @@ func TestOpcodes(t *testing.T) {
 
 	initialFrame := MakeVMFrame()
 
-	vm := MakeNaiveVM([]Callable{callable}, vmio.MakeVMLoggerConsole(vmio.ALL), initialFrame)
+	vm := MakeInterpreter([]Callable{callable}, vmio.MakeVMLoggerConsole(vmio.ALL), initialFrame)
 	for i, k := range callable.list {
 		initialFrame.pc = uint32(i)
 		k.Apply(vm)

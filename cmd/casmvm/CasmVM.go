@@ -15,8 +15,8 @@ import (
 	"github.com/aleferri/casmvm/pkg/vmio"
 )
 
-//ParseLineByLine provided source file and return the vm for the program
-func ParseLineByLine(sourceFile string, debugMode bool) (*vmex.NaiveVM, error) {
+// ParseLineByLine provided source file and return the vm for the program
+func ParseLineByLine(sourceFile string, debugMode bool) (*vmex.Interpreter, error) {
 	var programfile, programErr = os.Open(sourceFile)
 	if programErr != nil {
 		wnd, _ := os.Getwd()
@@ -69,7 +69,7 @@ func ParseLineByLine(sourceFile string, debugMode bool) (*vmex.NaiveVM, error) {
 		optimized = append(optimized, dce)
 	}
 
-	return vmex.MakeVerboseNaiveVM(optimized, log, vmex.MakeVMFrame()), nil
+	return vmex.MakeVerboseInterpreter(optimized, log, vmex.MakeVMFrame()), nil
 }
 
 func main() {

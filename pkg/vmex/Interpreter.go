@@ -44,24 +44,29 @@ func MakeCallable(name string, params []string, list []opcodes.Opcode) Callable 
 }
 
 // NaiveVM is a simple implementation of the VM interface found on opcodes
-type NaiveVM struct {
+type Interpreter struct {
 	callables []Callable
 	logger    vmio.VMLogger
 	current   VMFrame
+	wordSize  int
 	halt      bool
 	leave     bool
 	verbose   bool
 }
 
-func (t *NaiveVM) Frame() opcodes.LocalFrame {
+func (t *Interpreter) WordSize() int {
+	return t.wordSize
+}
+
+func (t *Interpreter) Frame() opcodes.LocalFrame {
 	return &t.current
 }
 
-func (t *NaiveVM) Enter(callIndex int32, vals ...uint16) (opcodes.LocalFrame, opcodes.VMError) {
+func (t *Interpreter) Enter(callIndex int32, vals ...uint16) (opcodes.LocalFrame, opcodes.VMError) {
 	return t.Invoke(callIndex, vals...)
 }
 
-func (t *NaiveVM) Invoke(callIndex int32, vals ...uint16) (opcodes.LocalFrame, opcodes.VMError) {
+func (t *Interpreter) Invoke(callIndex int32, vals ...uint16) (opcodes.LocalFrame, opcodes.VMError) {
 	callable := t.callables[callIndex]
 	if t.verbose {
 		fmt.Printf("Enter callable %d(%s) with args %v\n", callIndex, callable.name, vals)
@@ -89,27 +94,27 @@ func (t *NaiveVM) Invoke(callIndex int32, vals ...uint16) (opcodes.LocalFrame, o
 	return &next, err
 }
 
-func (t *NaiveVM) Leave() {
+func (t *Interpreter) Leave() {
 	t.leave = true
 }
 
-func (t *NaiveVM) Goto(disp int32) {
-	t.current.pc = uint32(int32(t.current.pc) + disp)
-}
-
-func (t *NaiveVM) WrapError(e error) opcodes.VMError {
-	return &OpcodeError{e, uint32(t.current.pc)}
-}
-
-func (t *NaiveVM) Halt() {
+func (t *Interpreter) Halt() {
 	t.halt = true
 }
 
-func (t *NaiveVM) Pointer() uint32 {
+func (t *Interpreter) Pointer() uint32 {
 	return uint32(t.current.PC())
 }
 
-func (t *NaiveVM) Run(c Callable, debugMode bool) opcodes.VMError {
+func (t *Interpreter) Goto(disp int32) {
+	t.current.pc = uint32(int32(t.current.pc) + disp)
+}
+
+func (t *Interpreter) WrapError(e error) opcodes.VMError {
+	return &OpcodeError{e, uint32(t.current.pc)}
+}
+
+func (t *Interpreter) Run(c Callable, debugMode bool) opcodes.VMError {
 	var err opcodes.VMError = nil
 	for !t.halt && !t.leave && err == nil && int(t.current.pc) < len(c.list) {
 		op := c.list[int(t.current.pc)]
@@ -122,7 +127,7 @@ func (t *NaiveVM) Run(c Callable, debugMode bool) opcodes.VMError {
 	return err
 }
 
-func (t *NaiveVM) Start(fIndex int32, frame opcodes.LocalFrame) opcodes.VMError {
+func (t *Interpreter) Start(fIndex int32, frame opcodes.LocalFrame) opcodes.VMError {
 	t.halt = false
 	callable := t.callables[fIndex]
 
@@ -141,29 +146,33 @@ func (t *NaiveVM) Start(fIndex int32, frame opcodes.LocalFrame) opcodes.VMError 
 	return err
 }
 
-func (t *NaiveVM) Dump(index int32) {
+func (t *Interpreter) Dump(index int32) {
 	t.callables[index].Dump()
 }
 
-func (t *NaiveVM) DumpAll() {
+func (t *Interpreter) DumpAll() {
 	for index, c := range t.callables {
 		fmt.Printf("Callable %d\n", index)
 		c.Dump()
 	}
 }
 
-func (t *NaiveVM) Logger() vmio.VMLogger {
+func (t *Interpreter) Logger() vmio.VMLogger {
 	return t.logger
 }
 
-func (t *NaiveVM) Callables() []Callable {
+func (t *Interpreter) Callables() []Callable {
 	return t.callables
 }
 
-func MakeNaiveVM(callables []Callable, log vmio.VMLogger, bootstrap VMFrame) *NaiveVM {
-	return &NaiveVM{callables, log, bootstrap, false, false, false}
+func MakeInterpreter(callables []Callable, log vmio.VMLogger, bootstrap VMFrame) *Interpreter {
+	return &Interpreter{callables, log, bootstrap, 1, false, false, false}
 }
 
-func MakeVerboseNaiveVM(callables []Callable, log vmio.VMLogger, bootstrap VMFrame) *NaiveVM {
-	return &NaiveVM{callables, log, bootstrap, false, false, true}
+func MakeVerboseInterpreter(callables []Callable, log vmio.VMLogger, bootstrap VMFrame) *Interpreter {
+	return &Interpreter{callables, log, bootstrap, 1, false, false, true}
+}
+
+func MakeNonByteInterpreter(callables []Callable, log vmio.VMLogger, wordSize int, bootstrap VMFrame) *Interpreter {
+	return &Interpreter{callables, log, bootstrap, wordSize, false, false, true}
 }
