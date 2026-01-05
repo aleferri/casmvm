@@ -12,7 +12,6 @@ type VM interface {
 	Start(callable int32, frame LocalFrame) VMError
 	Leave()
 	Halt()
-	WordSize() int
 	WrapError(e error) VMError
 	Logger() vmio.VMLogger
 	Dump(callable int32)

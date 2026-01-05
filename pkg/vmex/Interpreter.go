@@ -48,14 +48,9 @@ type Interpreter struct {
 	callables []Callable
 	logger    vmio.VMLogger
 	current   VMFrame
-	wordSize  int
 	halt      bool
 	leave     bool
 	verbose   bool
-}
-
-func (t *Interpreter) WordSize() int {
-	return t.wordSize
 }
 
 func (t *Interpreter) Frame() opcodes.LocalFrame {
@@ -166,13 +161,9 @@ func (t *Interpreter) Callables() []Callable {
 }
 
 func MakeInterpreter(callables []Callable, log vmio.VMLogger, bootstrap VMFrame) *Interpreter {
-	return &Interpreter{callables, log, bootstrap, 1, false, false, false}
+	return &Interpreter{callables, log, bootstrap, false, false, false}
 }
 
 func MakeVerboseInterpreter(callables []Callable, log vmio.VMLogger, bootstrap VMFrame) *Interpreter {
-	return &Interpreter{callables, log, bootstrap, 1, false, false, true}
-}
-
-func MakeNonByteInterpreter(callables []Callable, log vmio.VMLogger, wordSize int, bootstrap VMFrame) *Interpreter {
-	return &Interpreter{callables, log, bootstrap, wordSize, false, false, true}
+	return &Interpreter{callables, log, bootstrap, false, false, true}
 }
