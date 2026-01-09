@@ -6,7 +6,7 @@ import (
 	"github.com/aleferri/casmvm/pkg/vmio"
 )
 
-//SigWarning issue a warning on a specified parameter/local variable
+// SigWarning issue a warning on a specified parameter/local variable
 type SigWarning struct {
 	msg string
 	ref uint16
@@ -22,7 +22,7 @@ func (op *SigWarning) References() []uint16 {
 }
 
 func (op *SigWarning) String() string {
-	return "sigwarn " + strconv.FormatUint(uint64(op.ref), 10) + " " + op.msg
+	return "sigwarn %" + strconv.FormatUint(uint64(op.ref), 10) + " " + op.msg
 }
 
 func (op *SigWarning) Apply(vm VM) VMError {
@@ -31,7 +31,7 @@ func (op *SigWarning) Apply(vm VM) VMError {
 	return nil
 }
 
-//MakeSigWarning make an opcode of reference check
+// MakeSigWarning make an opcode of reference check
 func MakeSigWarning(msg string, ref uint16) Opcode {
 	return &SigWarning{msg, ref}
 }
