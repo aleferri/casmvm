@@ -139,7 +139,7 @@ func ParseOpcode(line string, verbose bool) (opcodes.Opcode, error) {
 		}
 	case "goto":
 		{
-			offset, _ := strconv.ParseInt(words[3], 10, 64)
+			offset, _ := strconv.ParseInt(words[1], 10, 64)
 			return opcodes.MakeGoto(int32(offset)), nil
 		}
 	case "leave":

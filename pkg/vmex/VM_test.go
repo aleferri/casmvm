@@ -23,13 +23,13 @@ func TestOpcodes(t *testing.T) {
 		initialFrame.pc = uint32(i)
 		k.Apply(vm)
 	}
-	if initialFrame.Returns().Peek(1) != -128 {
+	if initialFrame.Returns().Peek(1) != int64(-128) {
 		t.Errorf("Registers %v\n", initialFrame.values)
 		t.Errorf("Unexpected %v\n", initialFrame.Returns())
 		t.Fail()
 	}
-	if !vm.halt {
-		t.Errorf("Expected halt\n")
+	if initialFrame.pc != uint32(len(callable.list)-1) {
+		t.Errorf("Expected pc=%d, got %d\n", len(callable.list)-1, initialFrame.pc)
 		t.Fail()
 	}
 }

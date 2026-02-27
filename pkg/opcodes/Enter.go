@@ -36,6 +36,8 @@ func (op *Enter) Apply(vm VM) VMError {
 	called, err := vm.Enter(int32(op.callable), op.refs...)
 	rets := called.Returns().vals
 
+	// BUG: if lengths differ, returns are copied before error is returned,
+	// potentially causing index out of bounds if len(rets) < len(op.rets)
 	if len(rets) != len(op.rets) {
 		return vm.WrapError(fmt.Errorf("len of formal returns and effective returns diffs, expected %d returns, received %d instead", len(op.rets), len(rets)))
 	}
