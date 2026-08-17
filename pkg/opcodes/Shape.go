@@ -18,21 +18,16 @@ func (s Shape) Name() string {
 }
 
 func (s Shape) Reshape(a int64) int64 {
-	bitmask := 0xF
-	signmask := 0x7
-	for i := 4; i < int(s.bits); i += 4 {
-		bitmask = bitmask<<4 + 0xF
-		signmask = signmask << 4
+	if s.bits >= 64 {
+		return a
 	}
-
-	val := a & int64(bitmask)
-	sign := a & int64(signmask)
-	if len(s.name) == 3 && s.name[0] == 's' {
-		sext := sign
-		for t := 1; t < 64-int(s.bits); t++ {
-			sext = sext<<1 + sign
-		}
-		val = val | sext
+	mask := int64(1)<<s.bits - 1
+	val := a & mask
+	//shapes are named i<bits> when signed and u<bits> when unsigned: a signed shape must
+	//sign extend, otherwise every negative intermediate becomes a large positive and any
+	//comparison against it is wrong
+	if s.name[0] == 'i' && val&(int64(1)<<(s.bits-1)) != 0 {
+		val |= ^mask
 	}
 	return val
 }

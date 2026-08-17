@@ -8,7 +8,7 @@ type VMLoggerConsole struct {
 }
 
 func (log *VMLoggerConsole) Log(level uint16, s string) {
-	if log.level <= level {
+	if level <= log.level {
 		fmt.Println(s)
 	}
 }
