@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-//IConst push integer constant
+//IConst load an integer constant into a local
 type IConst struct {
 	value  int64
 	assign uint16
@@ -32,7 +32,7 @@ func (op *IConst) Apply(vm VM) VMError {
 	return nil
 }
 
-//MakeIConst to load the specified constant in the eval stack
+//MakeIConst to load the specified constant into a local
 func MakeIConst(assign uint16, value int64) Opcode {
 	return &IConst{value, assign}
 }

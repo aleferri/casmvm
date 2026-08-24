@@ -7,7 +7,7 @@ import (
 	"github.com/aleferri/casmvm/pkg/vmio"
 )
 
-// SigError issue a warning on a specified parameter/local variable
+// SigError issue an error on a specified parameter/local variable
 type SigError struct {
 	msg string
 	ref uint16
@@ -32,7 +32,7 @@ func (op *SigError) Apply(vm VM) VMError {
 	return vm.WrapError(errors.New(op.msg + strconv.FormatInt(val, 10)))
 }
 
-// MakeSigError make an opcode of reference check
+// MakeSigError make an opcode that signals an error about the referenced local
 func MakeSigError(msg string, ref uint16) Opcode {
 	return &SigError{msg, ref}
 }

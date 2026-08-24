@@ -3,26 +3,182 @@
     <head>
         <title>Opcodes for CASMVM</title>
         <style>
+            body {
+                font-family: sans-serif;
+                max-width: 52em;
+                margin: 2em auto;
+                line-height: 1.45;
+            }
+
             h4 {
                 font-weight: bold;
                 font-size: 16px;
+                margin-bottom: 0.2em;
+            }
+
+            code, pre {
+                background: #f2f2f2;
+                padding: 0.1em 0.3em;
+            }
+
+            pre {
+                padding: 0.6em;
             }
 
             .description {
                 display: inline-block;
                 width: 100%;
             }
+
+            table {
+                border-collapse: collapse;
+            }
+
+            td, th {
+                border: 1px solid #ccc;
+                padding: 0.3em 0.7em;
+                text-align: left;
+            }
         </style>
     </head>
     <body>
+        <h1>CASMVM opcodes</h1>
+
+        <h2>Execution model</h2>
+        <p>
+            CASMVM is a <strong>register machine</strong>. A program is a list of callables;
+            each callable is a flat sequence of opcodes. Every value lives in a numbered
+            <em>local</em>, written <code>%N</code> and holding a 64 bit integer.
+            Opcodes that produce a value write their result into the local on the left of
+            the <code>=</code> sign. Call arguments arrive in <code>%0 .. %N-1</code>;
+            return values live in a separate register file, filled by <code>leave</code>
+            and read back by the caller through <code>enter</code>.
+        </p>
+        <p>
+            Comments start with <code>;</code> and run to the end of the line.
+            Commas between operands are optional separators.
+            Execution of a <code>.csm</code> file starts from the first callable (index 0).
+        </p>
+
+        <h2>Shapes</h2>
+        <p>
+            Value opcodes carry a <em>shape</em> that truncates the result to the given
+            width; signed shapes sign-extend the truncated value back to 64 bits.
+        </p>
+        <table>
+            <tr><th>Signed</th><td><code>i8</code></td><td><code>i16</code></td><td><code>i32</code></td><td><code>i64</code></td></tr>
+            <tr><th>Unsigned</th><td><code>u8</code></td><td><code>u16</code></td><td><code>u32</code></td><td><code>u64</code></td></tr>
+        </table>
+
+        <h2>Jump offsets</h2>
+        <p>
+            The offsets of <code>branch</code> and <code>goto</code> are <strong>relative to
+            the next instruction</strong>: an offset of <code>0</code> falls through,
+            <code>-1</code> repeats the jump instruction itself.
+        </p>
+
+        <h2>Callable header (<code>.csm</code> files)</h2>
+        <pre>fn &lt;name&gt; &lt;arity&gt; [&lt;returns&gt;]</pre>
+        <p>
+            Starts a new callable. <code>arity</code> is the number of parameters;
+            the trailing returns count is accepted but currently informative only.
+        </p>
+
+        <h2>Opcodes</h2>
         <ol>
             <li>
-                <h4>add</h4>
-                <span class="description">Sum TOS + NOS</span>
-                <h5>Stack</h5>
-                <span class="description">Before: A B -- </span>
-                <span class="description">After: R -- </span>
+                <h4>const</h4>
+                <pre>%d = const &lt;shape&gt; &lt;value&gt;</pre>
+                <span class="description">Load the integer constant into local <code>%d</code>, reshaped to the given shape.</span>
+            </li>
+            <li>
+                <h4>local</h4>
+                <pre>%d = local &lt;shape&gt; %s</pre>
+                <span class="description">Copy local <code>%s</code> into local <code>%d</code>, reshaped to the given shape.</span>
+            </li>
+            <li>
+                <h4>binary operations</h4>
+                <pre>%d = &lt;op&gt; &lt;shape&gt; %a %b</pre>
+                <span class="description">
+                    Apply the binary operator to <code>%a</code> and <code>%b</code>, reshape
+                    the result and store it in <code>%d</code>. Available operators:
+                </span>
+                <table>
+                    <tr><th>Arithmetic</th><td><code>add</code> <code>sub</code> <code>mul</code> <code>div</code> <code>mod</code></td></tr>
+                    <tr><th>Bitwise</th><td><code>and</code> <code>or</code> <code>xor</code> <code>shl</code> <code>shr</code></td></tr>
+                    <tr><th>Comparison (yield 0 or 1)</th><td><code>cmpeq</code> <code>cmpne</code> <code>cmplt</code> <code>cmple</code> <code>cmpgt</code> <code>cmpge</code></td></tr>
+                    <tr><th>Logical (yield 0 or 1)</th><td><code>andl</code> <code>orl</code></td></tr>
+                </table>
+                <span class="description"><code>div</code> and <code>mod</code> stop execution with an error when the divisor is zero.</span>
+            </li>
+            <li>
+                <h4>unary operations</h4>
+                <pre>%d = &lt;op&gt; &lt;shape&gt; %a</pre>
+                <span class="description">
+                    Apply the unary operator to <code>%a</code>, reshape the result and store
+                    it in <code>%d</code>. Available operators: <code>neg</code> (arithmetic
+                    negation), <code>not</code> (bitwise complement), <code>notl</code>
+                    (logical not, yields 0 or 1).
+                </span>
+            </li>
+            <li>
+                <h4>enter</h4>
+                <pre>[ %r0 %r1 ... ] = enter &lt;callable&gt; %a %b ...</pre>
+                <span class="description">
+                    Call the callable with the given index, passing the listed locals as
+                    arguments. The callee's return values are copied into
+                    <code>%r0 %r1 ...</code>; their count must match the number of values
+                    the callee leaves, otherwise execution stops with an error.
+                </span>
+            </li>
+            <li>
+                <h4>leave</h4>
+                <pre>leave %a %b ...</pre>
+                <span class="description">
+                    Copy the listed locals into the return registers and leave the current
+                    callable. The list may be empty.
+                </span>
+            </li>
+            <li>
+                <h4>branch</h4>
+                <pre>branch %ref &lt;value&gt; &lt;offset&gt;</pre>
+                <span class="description">
+                    If local <code>%ref</code> equals the constant <code>value</code>, jump
+                    by <code>offset</code> (relative to the next instruction).
+                </span>
+            </li>
+            <li>
+                <h4>goto</h4>
+                <pre>goto &lt;offset&gt;</pre>
+                <span class="description">Unconditional jump by <code>offset</code> (relative to the next instruction).</span>
+            </li>
+            <li>
+                <h4>sigwarn</h4>
+                <pre>sigwarn %ref "message"</pre>
+                <span class="description">
+                    Log a warning composed of the message followed by the value of
+                    <code>%ref</code>. Execution continues.
+                </span>
+            </li>
+            <li>
+                <h4>sigerr</h4>
+                <pre>sigerr %ref "message"</pre>
+                <span class="description">
+                    Log an error composed of the message followed by the value of
+                    <code>%ref</code>, then stop execution with that error.
+                </span>
             </li>
         </ol>
+
+        <h2>Example</h2>
+        <pre>fn main 0 1
+%0 = const i16 42
+[ %1 ] = enter 1 %0     ; call triple(42)
+leave %1
+
+fn triple 1 1
+%1 = const i16 3
+%2 = mul i16 %0 %1
+leave %2</pre>
     </body>
 </html>

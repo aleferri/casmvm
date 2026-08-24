@@ -22,6 +22,11 @@ func (op *UnaryOp) References() []uint16 {
 	return r
 }
 
+//Shape of the result
+func (op *UnaryOp) Shape() Shape {
+	return op.shape
+}
+
 func (op *UnaryOp) Operator() UnaryOperator {
 	return op.operator
 }
@@ -36,11 +41,11 @@ func (op *UnaryOp) Apply(vm VM) VMError {
 	if err != nil {
 		return vm.WrapError(err)
 	}
-	vm.Frame().Values().Put(op.local, result)
+	vm.Frame().Values().Put(op.local, op.shape.Reshape(result))
 	return nil
 }
 
-//MakeUnaryOp create an unary operation to be applied in the stack
+//MakeUnaryOp create an unary operation on a local
 func MakeUnaryOp(local uint16, name string, shape Shape, ref uint16, operator UnaryOperator) Opcode {
 	return &UnaryOp{name, local, ref, shape, operator}
 }

@@ -66,3 +66,23 @@ func TestCasmVMErr(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestCasmVMLoop(t *testing.T) {
+	vm, err := ParseLineByLine("../../tests/loop.csm", false)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	ret, runErr := vm.Enter(0)
+	if runErr != nil {
+		t.Fatal(runErr.Error())
+	}
+	if ret.Returns().Peek(0) != 15 {
+		t.Errorf("Expected 15, got %d", ret.Returns().Peek(0))
+	}
+
+	main := vm.Callables()[0]
+	if len(main.Listing()) != 8 {
+		t.Errorf("Expected the dead opcode to be eliminated, got %d opcodes", len(main.Listing()))
+	}
+}

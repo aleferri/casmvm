@@ -31,7 +31,7 @@ func (op *SigWarning) Apply(vm VM) VMError {
 	return nil
 }
 
-// MakeSigWarning make an opcode of reference check
+// MakeSigWarning make an opcode that signals a warning about the referenced local
 func MakeSigWarning(msg string, ref uint16) Opcode {
 	return &SigWarning{msg, ref}
 }

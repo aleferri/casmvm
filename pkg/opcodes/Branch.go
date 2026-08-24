@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-//Branch is the branching opcode, pop the integer constant, check against the compare then branch to the result
+//Branch is the conditional jump opcode: compare the referenced local against a constant, jump by the relative offset if they are equal
 type Branch struct {
 	cmpval int64
 	ifeq   int32
@@ -22,6 +22,16 @@ func (op *Branch) References() []uint16 {
 
 func (op *Branch) String() string {
 	return fmt.Sprintf("ifeq %%%d %d %d", op.cmpref, op.cmpval, op.ifeq)
+}
+
+//Offset of the jump, relative to the next instruction
+func (op *Branch) Offset() int32 {
+	return op.ifeq
+}
+
+//WithOffset return a copy of the branch with the provided offset
+func (op *Branch) WithOffset(offset int32) *Branch {
+	return &Branch{op.cmpval, offset, op.cmpref}
 }
 
 func (op *Branch) Apply(vm VM) VMError {

@@ -40,3 +40,11 @@ var IntShape = Shape{"i32", 32, 0}
 var UIntShape = Shape{"u32", 32, 0}
 var LongShape = Shape{"i64", 64, 0}
 var ULongShape = Shape{"u64", 64, 0}
+
+//ShapesByName index all the predefined shapes by their textual name
+var ShapesByName = map[string]Shape{
+	"i8": ByteShape, "u8": UByteShape,
+	"i16": ShortShape, "u16": UShortShape,
+	"i32": IntShape, "u32": UIntShape,
+	"i64": LongShape, "u64": ULongShape,
+}

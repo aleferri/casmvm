@@ -1,0 +1,12 @@
+; somma degli interi da 1 a 5 con un loop, piu' un opcode morto nel corpo:
+; l'ottimizzatore deve rimuoverlo e ribasare il goto all'indietro
+fn main 0 1
+%0 = const i64 0
+%1 = const i64 5
+%2 = const i64 1
+%0 = add i64 %0 %1
+%9 = const i64 999
+%1 = sub i64 %1 %2
+branch %1 0 1
+goto -5
+leave %0

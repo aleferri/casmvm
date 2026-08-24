@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-//Goto is the branching opcode, pop the integer constant, check against the compare then branch to the result
+//Goto is the unconditional jump opcode: jump by the relative offset
 type Goto struct {
 	offset int32
 }
@@ -20,6 +20,16 @@ func (op *Goto) References() []uint16 {
 
 func (op *Goto) String() string {
 	return fmt.Sprintf("goto %d", op.offset)
+}
+
+//Offset of the jump, relative to the next instruction
+func (op *Goto) Offset() int32 {
+	return op.offset
+}
+
+//WithOffset return a copy of the goto with the provided offset
+func (op *Goto) WithOffset(offset int32) *Goto {
+	return &Goto{offset}
 }
 
 func (op *Goto) Apply(vm VM) VMError {

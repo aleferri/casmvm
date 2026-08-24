@@ -36,15 +36,21 @@ func ParseLineByLine(sourceFile string, debugMode bool) (*vmex.Interpreter, erro
 	for keepGoing {
 		line, err := programCode.ReadString('\n')
 		line = strings.TrimSpace(line)
-		if line[0:2] == "fn" {
+		tokens := strings.Fields(line)
+		if len(tokens) > 0 && tokens[0] == "fn" {
 			if len(listing) > 0 {
 				callables = append(callables, vmex.MakeCallable(fn, params, listing))
 				listing = []opcodes.Opcode{}
 			}
-			tokens := strings.Fields(line)
+			if len(tokens) < 3 {
+				return nil, fmt.Errorf("expected 'fn <name> <arity>', found '%s' instead", line)
+			}
 			fn = tokens[1]
 			params = []string{}
-			n, _ := strconv.Atoi(tokens[2])
+			n, arityErr := strconv.Atoi(tokens[2])
+			if arityErr != nil {
+				return nil, fmt.Errorf("expected the arity of '%s', found '%s' instead", fn, tokens[2])
+			}
 			for i := 0; i < n; i++ {
 				params = append(params, fmt.Sprintf("%%%d", i))
 			}
@@ -52,10 +58,10 @@ func ParseLineByLine(sourceFile string, debugMode bool) (*vmex.Interpreter, erro
 		}
 		if line != "" && line[0] != ';' {
 			opcode, parseError := asm.ParseOpcode(line, debugMode)
-			listing = append(listing, opcode)
 			if parseError != nil {
 				return nil, parseError
 			}
+			listing = append(listing, opcode)
 		}
 		keepGoing = err == nil
 	}
@@ -100,7 +106,7 @@ func main() {
 			if results.Returns().IsEmpty() {
 				fmt.Println("No result")
 			} else {
-				fmt.Println(vm.Frame().Returns())
+				fmt.Println(results.Returns())
 			}
 		} else if f == "--help" {
 			fmt.Println("Usage: casmvm -debug=false|true filename.csm")

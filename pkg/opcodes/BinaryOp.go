@@ -30,12 +30,19 @@ func (op *BinaryOp) Locals() []uint16 {
 	return []uint16{op.local}
 }
 
-func (op *BinaryOp) SetLeft(a Operand) {
-	op.aRef = a
+//Name of the operation
+func (op *BinaryOp) Name() string {
+	return op.name
 }
 
-func (op *BinaryOp) SetRight(b Operand) {
-	op.bRef = b
+//Shape of the result
+func (op *BinaryOp) Shape() Shape {
+	return op.shape
+}
+
+//WithOperands return a copy of the operation with the provided operands
+func (op *BinaryOp) WithOperands(a Operand, b Operand) *BinaryOp {
+	return &BinaryOp{op.name, op.shape, op.local, a, b, op.operator}
 }
 
 func (op *BinaryOp) References() []uint16 {
@@ -68,7 +75,7 @@ func (op *BinaryOp) Apply(vm VM) VMError {
 	return nil
 }
 
-//MakeBinaryOp create a binary operation to be applied in the stack
+//MakeBinaryOp create a binary operation between two locals
 func MakeBinaryOp(local uint16, name string, shape Shape, aRef uint16, bRef uint16, operator BinaryOperator) Opcode {
 	return &BinaryOp{name, shape, local, MakeReference(aRef), MakeReference(bRef), operator}
 }

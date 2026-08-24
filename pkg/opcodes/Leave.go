@@ -32,7 +32,7 @@ func (op *Leave) Apply(vm VM) VMError {
 	return nil
 }
 
-//MakeLeave make an opcode of reference load
+//MakeLeave make the opcode that copies the listed locals into the return registers and leaves the frame
 func MakeLeave(refs ...uint16) Opcode {
 	return &Leave{refs}
 }

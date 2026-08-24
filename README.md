@@ -1,5 +1,5 @@
 # casmvm
-Casmeleon VM exported from main project to improve debuggability and define responsabilities
+Casmeleon VM exported from main project to improve debuggability and define responsibilities
 
 # Future directions
-Make casmeleon use this library both for debug purpose (to test generated traces after file parsing) and to reduce casmeleon responsabilities
+Make casmeleon use this library both for debug purpose (to test generated traces after file parsing) and to reduce casmeleon responsibilities

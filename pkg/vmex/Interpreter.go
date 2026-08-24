@@ -43,7 +43,7 @@ func MakeCallable(name string, params []string, list []opcodes.Opcode) Callable 
 	return Callable{name, params, list}
 }
 
-// NaiveVM is a simple implementation of the VM interface found on opcodes
+// Interpreter is a simple implementation of the VM interface found on opcodes
 type Interpreter struct {
 	callables []Callable
 	logger    vmio.VMLogger
@@ -106,7 +106,11 @@ func (t *Interpreter) Goto(disp int32) {
 }
 
 func (t *Interpreter) WrapError(e error) opcodes.VMError {
-	return &OpcodeError{e, uint32(t.current.pc)}
+	pc := t.current.pc
+	if pc > 0 {
+		pc--
+	}
+	return &OpcodeError{e, pc}
 }
 
 func (t *Interpreter) Run(c Callable, debugMode bool) opcodes.VMError {
